@@ -11,21 +11,43 @@
 
 int main(void) {
     
-    // seteo el registro Data Direction Register B como entrada o salida, en este caso como salida = el bit 0 y el bit 3  
+    // seteo el registro Data Direction Register B como entrada o salida, en este caso como salida = el bit 0 y el bit 3
+    // el primero miembro indica que al 1 decimal(0b00000001) se le hace un corrimiento hacia la izquierda de 0 unidades, ya que DB0 = 0
+    // el segundo miembro indica que al 1 decimal(0b00000001) se le hace un corrimiento hacia la izquierda de 2 unidades, ya que DB2 = 2
+    // DDRB = DDRB | 0b00000001 | 0b00000100
+    //     0b00000000
+    // OR  0b00000001
+    // OR  0b00000100
+    // =   0b00000101
     DDRB |= (1 << DDB0) | (1 << DDB2);
 
     while (1)
     {
-        // Coloco el bit 0 y el bit 2 del registro B en 1 binario para encenderlo
+        // ENCENDER PB0
+        //     0b00000000
+        // OR  0b00000001
+        // =   0b00000001
         PORTB |= (1 << PORTB0);
+
+        // APAGAR PB2
+        //     0b00000001
+        // AND 0b11111011
+        // =   0b00000001
         PORTB &= ~(1 << PORTB2);
         _delay_ms(1000);
 
-        // Coloco el bit 0 en 0 binario para apagarlo
+        // APAGAR PB0
+        //     0b00000001
+        // AND 0b11111110
+        // =   0b00000000
         PORTB &= ~(1 << PORTB0);
+
+        // ENCENDER PB2
+        //     0b00000000
+        // OR  0b00000100
+        // =   0b00000100
         PORTB |= (1 << PORTB2);
         _delay_ms(1000);
 
     }
 }
-
