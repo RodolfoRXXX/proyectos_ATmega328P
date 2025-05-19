@@ -6,22 +6,24 @@
 
 #include <avr/io.h>
 
-#include <utils/delay.h>
+#include <util/delay.h>
 
 int main(void) {
 
-    // Defino las constantes
+    // Defino las constantes B en hexadecimal, C en decimal y D en binario
     const uint8_t B = 0x96,
                   C = 76,
                   D = 0b00001111;
 
+    // Seteo los registros de dirección como salidas (0b11111111)
     DDRB = 0xff;
     DDRC = 0xff;
     DDRD = 0xff;
 
-    PORTB = B;
-    PORTC = C;
-    PORTD = D;
+    // Seteo los puertos con las constantes
+    PORTB = B/3;
+    PORTC = C*3;
+    PORTD = C%D;
 
-    return 0
+    return 0;
 }
