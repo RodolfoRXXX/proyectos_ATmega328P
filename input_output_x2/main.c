@@ -1,16 +1,6 @@
 /*
     Proyecto que toma la entrada del puerto D en binario y responde desde el puerto C encendiendo dos displays de 8 segmentos
     mostrando dígitos en decimal hasta 99
-
-    1 - 0b00000001 = 0000110
-    2 - 0b00000010 = 1011011
-    3 - 0b00000011 = 1001111
-    4 - 0b00000100 = 1100110
-    5 - 0b00000101 = 1101101
-    6 - 0b00000110 = 1111101
-    7 - 0b00000111 = 0000111
-    8 - 0b00001000 = 1111111
-    9 - 0b00001001 = 1101111
 */
 
 #define F_CPU 1000000UL
@@ -37,7 +27,7 @@ void config_P() {
     DDRB = 0xFF;   // PORTB como salida (control de displays)
     PORTD = 0xFF;  // Pull-ups en entrada
     PORTC = 0x00;  // Apagar segmentos al inicio
-    PORTB |= (1 << PORTB0) | (1 << PORTB1);  // Ambos displays desactivados al inicio (activo en bajo)
+    PORTB |= (1 << PORTB0) | (1 << PORTB1) | (1 << PORTB2);  // Todos los displays desactivados al inicio (activo en bajo)
 }
 
 int main(void) {
@@ -45,22 +35,29 @@ int main(void) {
 
     while (1) {
         uint8_t valor = PIND;
-        if (valor > 99) valor = 99;  // Limitar máximo
+        //if (valor > 99) valor = 99;  // Limitar máximo
 
         uint8_t unidades = valor % 10;
-        uint8_t decenas = valor / 10;
+        uint8_t decenas = (valor / 10) % 10;
+        uint8_t centenas = valor / 100;
+
+        // Mostrar centenas
+        PORTC = numeros7seg[centenas];
+        PORTB |= (1 << PORTB0) | (1 << PORTB1) | (1 << PORTB2);
+        PORTB &= ~(1 << PORTB0);  // Activar display centenas
+        _delay_ms(1);
 
         // Mostrar decenas
         PORTC = numeros7seg[decenas];
-        PORTB &= ~(1 << PORTB0);  // Activar display decenas
-        PORTB |= (1 << PORTB1);   // Desactivar display unidades
-        _delay_ms(5);
+        PORTB |= (1 << PORTB0) | (1 << PORTB1) | (1 << PORTB2);
+        PORTB &= ~(1 << PORTB1);  // Activar display decenas
+        _delay_ms(1);
 
         // Mostrar unidades
         PORTC = numeros7seg[unidades];
-        PORTB &= ~(1 << PORTB1);  // Activar display decenas
-        PORTB |= (1 << PORTB0);   // Desactivar display unidades
-        _delay_ms(5);
+        PORTB |= (1 << PORTB0) | (1 << PORTB1) | (1 << PORTB2);
+        PORTB &= ~(1 << PORTB2);  // Activar display decenas
+        _delay_ms(1);
 
     }
 }
