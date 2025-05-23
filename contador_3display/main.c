@@ -10,6 +10,8 @@
 
 uint8_t PB_salida = 0xff;
 uint8_t PC_salida = 0xff;
+uint8_t PD_entrada = 0x00;
+uint8_t PUA = 0xff;
 
 // Array con la configuración de activado de cada led del display para multiplexado dinámico
 const uint8_t display7seg[] = {
@@ -38,6 +40,10 @@ int main(void) {
     uint8_t subiendo = 1;
 
     while (1) {
+        if (!(PIND & (1 << PORTD0))) {
+            contador = 0;
+        }
+        
         mostrarDisplay(contador);
 
         if (subiendo) {
@@ -63,8 +69,10 @@ int main(void) {
 void config_P() {
     DDRB = PB_salida;
     DDRC = PC_salida;
+    DDRD = PD_entrada;
     PORTB |= (1 << PORTB0) | (1 << PORTB1) | (1 << PORTB2); // puerto B pines en alto, conectados al cátodo de los displays, activa cuando baja
     PORTC = 0x00;   // puerto C en baja así no hay ningún led activado
+    PORTD = PUA;
 }
 
 // función que muestra el dígito en el display
