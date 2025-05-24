@@ -19,24 +19,57 @@
 uint8_t PD_entrada = 0x00;
 uint8_t PB_salida = 0xff;
 uint8_t PC_salida = 0xff;
-uint8_t PUA = 0xff;
+//uint8_t PUD = 0xff;
 
-int main(void) {
-
-    // desactiva las interrupciones globales
-    cli();
-
-    EICRA = (1 << ISC0) | (1 << ISC1);
-
-}
-
-// funciones
-// función de configuración
+// prototipos
 void config_P() {
     DDRD = PD_entrada;
-    DDRB = PD_salida;
+    DDRB = PB_salida;
     DDRC = PC_salida;
-    PORTD = PUA;
+    PORTD = 0xff;
     PORTB = 0x00;
     PORTC = 0x00;
 }
+
+int main(void) {
+
+    uint8_t i;
+
+    // Configuración
+        config_P();
+
+        // desactiva las interrupciones globales
+        cli();
+
+        // configuramos el modo en que se generan las interrupciones modificando el registro
+        // INT0 se activa en flanco de bajada (ISC01 = 0, ISC00 = 1)
+        EICRA = (1 << ISC00);
+
+        // activar el pin INT0 o INT1 que va a estar pendiente de la interrupción
+        // en este caso activamos el INT0
+        EIMSK = (1 << INT0);
+
+        // activamos las interrupciones globales
+        sei();
+
+    while (1) {
+        for (i = 0; i < 255; i++) {
+            PORTB = i;
+            _delay_ms(500);
+        }
+        i = 0;
+    }
+}
+
+// funciones
+// función de interrupción
+ISR(INT0_vect) {
+    uint8_t i;
+   for (i = 0; i < 10; i++) {
+      PORTC ^= 0xFF;
+      _delay_ms(500);
+   }
+   PORTC = 0x00; // Asegura que los LEDs estén apagados después
+}
+
+// función de configuración
