@@ -19,6 +19,7 @@
 uint8_t PC_salida = 0xff;
 uint8_t PD_salida = 0xff;
 uint8_t estado = 0;
+uint8_t contador = 30;
 
 const uint8_t dig7seg[] = {
     0b00111111, // 0
@@ -36,7 +37,7 @@ const uint8_t dig7seg[] = {
 
 // prototipos
 void config_P();
-void conteo(uint8_t tiempo);
+void conteo(int tiempo);
 
 int main(void) {
 
@@ -51,32 +52,41 @@ int main(void) {
 
     sei();
 
-    uint8_t i;
-
     while (1) {
       if (estado == 0) {
         // Rojo
         PORTD &= ~((1 << PORTD0) | (1 << PORTD1) | (1 << PORTD2)); // limpia los estados de las tres salidas del puerto D
         PORTD = (1 << PORTD0);  // prendo led Rojo
-        for (i = 30; i > 0; i--) {
-          conteo(i);
+        while ((contador > 0) && (estado == 0)) {
+          conteo(contador);
+          contador--;
         }
+        contador = 5;
         estado = 1;
       } else if (estado == 1) {
         // Amarillo
         PORTD &= ~((1 << PORTD0) | (1 << PORTD1) | (1 << PORTD2));  // limpia los estados de las tres salidas del puerto D
         PORTD = (1 << PORTD1);  // prendo led Amarillo
-        for (i = 5; i > 0; i--) {
-          conteo(i);
+        contador = 5;
+        while ((contador > 0) && (estado == 1)) {
+          conteo(contador);
+          contador--;
         }
+        contador = 25;
         estado = 2;
       } else {
         // Verde
         PORTD &= ~((1 << PORTD0) | (1 << PORTD1) | (1 << PORTD2));  // limpia los estados de las tres salidas del puerto D
         PORTD = (1 << PORTD2);  // prendo led Verde
-        for (i = 25; i > 0; i--) {
-          conteo(i);
+        while ((contador > 0) && (estado == 2)) {
+          conteo(contador);
+          // código que titila el verde dependiente del delay de la función conteo()
+          if (contador < 6) {
+            PORTD ^= (1 << PORTD2);
+          }
+          contador--;
         }
+        contador = 30;
         estado = 0;
       }
     }
@@ -89,7 +99,7 @@ void config_P() {
     DDRB = 0b00000011;
     DDRC = PC_salida;
     PORTD = 0x00;
-    PORTB |= (1 << PORTB0) | (1 << PORTB1);
+    PORTB |= (1 << PORTB0) | (1 << PORTB1) | (1 << PORTB5) | (1 << PORTB7);
     PORTC = 0x00;
 }
 
@@ -101,21 +111,26 @@ void conteo(int tiempo) {
 
     uint8_t j;
 
-    for (j = 0; j < 500; j++) { // 500 * (2*1ms) = 1000ms es lo que dura el ciclo del for
+    for (j = 0; j < 200; j++) { // 200 * (2*2ms) = 800ms es lo que dura el ciclo del for
         // mostrar unidad
         PORTC = dig7seg[unidad]; // busca el valor en el array
         PORTB |= (1 << PORTB0) | (1 << PORTB1); // desactiva los cátodos de los displays
         PORTB &= ~(1 << PORTB1);    // activa el cátodo del display
-        _delay_ms(1);
+        _delay_ms(2);
 
         // mostrar decena
         PORTC = dig7seg[decena]; // busca el valor en el array
         PORTB |= (1 << PORTB0) | (1 << PORTB1); // desactiva los cátodos de los displays
         PORTB &= ~(1 << PORTB0);    // activa el cátodo del display
-        _delay_ms(1);
+        _delay_ms(2);
     }
 }
 
 ISR(PCINT0_vect) {
   estado = 0;  // Reinicia al estado ROJO si hay interrupción
+  if(!(PINB & (1 << PINB5))) {
+    contador = 15;
+  } else if(!(PINB & (1 << PINB7))) {
+    contador = 10;
+  }
 }
