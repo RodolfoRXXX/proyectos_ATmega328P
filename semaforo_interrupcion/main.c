@@ -72,8 +72,10 @@ int main(void) {
           conteo(contador);
           contador--;
         }
-        contador = 25;
-        estado = 2;
+        if (estado != 0) {
+          contador = 25;
+          estado = 2;
+        }
       } else {
         // Verde
         PORTD &= ~((1 << PORTD0) | (1 << PORTD1) | (1 << PORTD2));  // limpia los estados de las tres salidas del puerto D
@@ -86,8 +88,10 @@ int main(void) {
           }
           contador--;
         }
-        contador = 30;
-        estado = 0;
+        if (estado != 0) {
+          contador = 30;
+          estado = 0;
+        }
       }
     }
 }
