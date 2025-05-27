@@ -16,13 +16,12 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-uint8_t PB_salida = 0xff;
 uint8_t PC_salida = 0xff;
 uint8_t PD_salida = 0xff;
 uint8_t estado = 0;
 
 const uint8_t dig7seg[] = {
-    0b00011111, // 0
+    0b00111111, // 0
     0b00000110, // 1
     0b01011011, // 2
     0b01001111, // 3
@@ -31,7 +30,7 @@ const uint8_t dig7seg[] = {
     0b01111101, // 6
     0b00000111, // 7
     0b01111111, // 8
-    0b01100111  // 9
+    0b01101111  // 9
 };
 
 
@@ -58,7 +57,7 @@ int main(void) {
       if (estado == 0) {
         // Rojo
         PORTD &= ~((1 << PORTD0) | (1 << PORTD1) | (1 << PORTD2)); // limpia los estados de las tres salidas del puerto D
-        PORTD = (1 << PORTD0);
+        PORTD = (1 << PORTD0);  // prendo led Rojo
         for (i = 30; i > 0; i--) {
           conteo(i);
         }
@@ -66,7 +65,7 @@ int main(void) {
       } else if (estado == 1) {
         // Amarillo
         PORTD &= ~((1 << PORTD0) | (1 << PORTD1) | (1 << PORTD2));  // limpia los estados de las tres salidas del puerto D
-        PORTD = (1 << PORTD1);
+        PORTD = (1 << PORTD1);  // prendo led Amarillo
         for (i = 5; i > 0; i--) {
           conteo(i);
         }
@@ -74,7 +73,7 @@ int main(void) {
       } else {
         // Verde
         PORTD &= ~((1 << PORTD0) | (1 << PORTD1) | (1 << PORTD2));  // limpia los estados de las tres salidas del puerto D
-        PORTD = (1 << PORTD2);
+        PORTD = (1 << PORTD2);  // prendo led Verde
         for (i = 25; i > 0; i--) {
           conteo(i);
         }
@@ -87,22 +86,22 @@ int main(void) {
 // función configuración
 void config_P() {
     DDRD = PD_salida;
-    DDRB = PB_salida;
+    DDRB = 0b00000011;
     DDRC = PC_salida;
     PORTD = 0x00;
-    PORTB = PORTB |= (1 << PORTB0) | (1 << PORTB1);
+    PORTB |= (1 << PORTB0) | (1 << PORTB1);
     PORTC = 0x00;
 }
 
 // funciones para encender LED semáforo
 // función que muestra el dígito en el display
-void conteo(uint8_t tiempo) {
-    uint8_t unidad = tiempo % 10;
-    uint8_t decena = tiempo / 10;
+void conteo(int tiempo) {
+    int unidad = tiempo % 10;
+    int decena = tiempo / 10;
 
-    uint8_t i;
+    uint8_t j;
 
-    for (i = 0; i < 500; i++) { // 250 * (2*1ms) = 500ms es lo que dura el ciclo del for
+    for (j = 0; j < 500; j++) { // 500 * (2*1ms) = 1000ms es lo que dura el ciclo del for
         // mostrar unidad
         PORTC = dig7seg[unidad]; // busca el valor en el array
         PORTB |= (1 << PORTB0) | (1 << PORTB1); // desactiva los cátodos de los displays
