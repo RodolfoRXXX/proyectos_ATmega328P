@@ -38,22 +38,37 @@
 
 int ms = 0;
 
+// prototipos
+
+void config();
+
+
+// principal
+
 int main(void) {
 
     // configuración
-    DDRB = (1 << DDB0);         // configura el PB0 como salida para el LED
-    TCCR0A = (1 << WGM01);      // configura el "Normal Mode" y CTC - clear time on compare match
-    TCCR0B = (1 << CS02) | (0 << CS01) | (1 << CS00);  // configura el prescaler en 1024
-    TIMSK0 = (1 << OCIE0A);     // hbilita la interrupción por comparación del registro A
-    OCR0A = 195.31;
+    config();
 
-    sei();
+    sei();  // habilita las interrupciones
 
     while (1) {
         /* code */
     }
 
 }
+
+// funciones de configuración
+
+void config() {
+    DDRB = (1 << DDB0);         // configura el PB0 como salida para el LED
+    TCCR0A = (1 << WGM01);      // configura el "Normal Mode" y CTC - clear time on compare match
+    TCCR0B = (1 << CS02) | (0 << CS01) | (1 << CS00);  // configura el prescaler en 1024
+    TIMSK0 = (1 << OCIE0A);     // habilita la interrupción por comparación del registro A
+    OCR0A = 195.31;
+}
+
+// Interrupción por comparación con el timer 0 y el comparador A
 
 ISR(TIMER0_COMPA_vect) {
     ms++;  // en cada interrupción aumenta el contador
