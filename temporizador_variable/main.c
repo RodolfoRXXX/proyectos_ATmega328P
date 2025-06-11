@@ -34,15 +34,14 @@ int main(void) {
     while (1) {
 
         // si aprieta el botón D0, sube
-        if (!(PIND & (1 << PIND0))) {
+        if (!(PIND & (1 << PIND0)) && (time < 11)) {
             time++;
         }
 
         // si aprieta el botón D1, baja
-        if((!(PIND & (1 << PIND1))) && (time > 0)) {
+        if((!(PIND & (1 << PIND1))) && (time > 1)) {
             time--;
         }
-           
     }
 }
 
@@ -50,8 +49,8 @@ int main(void) {
 
 void config() {
     DDRB = (1 << DDB0);         // configura el PB0 como salida para el LED
-    DDRD = 0x00;    // configura dos pones D0 y D1 como entrada
-    PORTD = 0x00;   // inhabilito las resistencias pull-up internas de todo el puerto D
+    DDRD = (0 << DDD1) | (0 << DDD0);    // configura dos pones D0 y D1 como entrada
+    PORTD = (0 << DDD1) | (0 << DDD0);   // inhabilito las resistencias pull-up internas de los bits 0 y 1 del puerto D
     TCCR0A = (1 << WGM01);      // configura el "Normal Mode" y CTC - clear time on compare match
     TCCR0B = (1 << CS02) | (0 << CS01) | (1 << CS00);  // configura el prescaler en 1024
     TIMSK0 = (1 << OCIE0A);     // habilita la interrupción por comparación del registro A
