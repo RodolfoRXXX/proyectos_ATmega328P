@@ -13,10 +13,12 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <util/delay.h>
 
-int ms = 0;
-uint8_t time = 9;
+volatile int ms = 0;
+volatile uint8_t time = 5;
+
+uint8_t prev_d0 = 1;
+uint8_t prev_d1 = 1;
 
 // Array con la configuración de activado de cada led del display para multiplexado dinámico
 const uint8_t display7seg[] = {
@@ -46,30 +48,21 @@ int main(void) {
     sei();
     mostrarDisplay(time);
 
+    uint8_t now_d0 = (PIND & (1 << PIND0)) >> PIND0;
+    uint8_t now_d1 = (PIND & (1 << PIND1)) >> PIND1;
+
     while (1) {
 
         // si aprieta el botón D0, sube
-        if (!(PIND & (1 << PIND0))) {
-            _delay_ms(50);
-            if (!(PIND & (1 << PIND0))) {
-                if (time < 10) {
-                    time++;
-                    mostrarDisplay(time);
-                }            
-            }
-            while (!(PIND & (1 << PIND0))); // esperar a que suelte el botón
+        if (prev_d0 == 1 && now_d0 == 0 && time < 11) {
+            time++;
+            mostrarDisplay(time);
         }
 
         // si aprieta el botón D1, baja
-        if ((!(PIND & (1 << PIND1)))) {
-            _delay_ms(50);
-            if ((!(PIND & (1 << PIND1)))) {
-                if (time > 1) {
-                    time--;
-                    mostrarDisplay(time);
-                }            
-            }
-            while (!(PIND & (1 << PIND1))); // esperar a que suelte el botón
+        if (prev_d1 == 1 && now_d1 == 0 && time > 1) {
+            time--;
+            mostrarDisplay(time);
         }
     }
 }
@@ -78,7 +71,7 @@ int main(void) {
 
 ISR(TIMER0_COMPA_vect) {
     ms++;
-    if (ms > time*10) {
+    if (ms > time) {
         PORTB ^= (1 << PORTB0);
         ms = 0;
     }
