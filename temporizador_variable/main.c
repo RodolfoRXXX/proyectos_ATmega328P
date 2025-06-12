@@ -14,8 +14,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-volatile int ms = 0;
-volatile uint8_t time = 5;
+int ms = 0;
+uint8_t time = 5;
 
 uint8_t prev_d0 = 1;
 uint8_t prev_d1 = 1;
@@ -48,13 +48,13 @@ int main(void) {
     sei();
     mostrarDisplay(time);
 
-    uint8_t now_d0 = (PIND & (1 << PIND0)) >> PIND0;
-    uint8_t now_d1 = (PIND & (1 << PIND1)) >> PIND1;
-
     while (1) {
 
+        uint8_t now_d0 = (PIND & (1 << PIND0)) >> PIND0;
+        uint8_t now_d1 = (PIND & (1 << PIND1)) >> PIND1;
+
         // si aprieta el botón D0, sube
-        if (prev_d0 == 1 && now_d0 == 0 && time < 11) {
+        if (prev_d0 == 1 && now_d0 == 0 && time < 10) {
             time++;
             mostrarDisplay(time);
         }
@@ -64,6 +64,9 @@ int main(void) {
             time--;
             mostrarDisplay(time);
         }
+
+        prev_d0 = now_d0;
+        prev_d1 = now_d1;
     }
 }
 
@@ -71,7 +74,7 @@ int main(void) {
 
 ISR(TIMER0_COMPA_vect) {
     ms++;
-    if (ms > time) {
+    if (ms > time*100) {
         PORTB ^= (1 << PORTB0);
         ms = 0;
     }
@@ -88,7 +91,7 @@ void config() {
     TCCR0A = (1 << WGM01);                              // configura el "Normal Mode" y CTC - clear time on compare match
     TCCR0B = (1 << CS02) | (0 << CS01) | (1 << CS00);   // configura el prescaler en 1024
     TIMSK0 = (1 << OCIE0A);                             // habilita la interrupción por comparación del registro A
-    OCR0A = 19;
+    OCR0A = 195;
 }
 
 void mostrarDisplay(uint8_t valor) {
