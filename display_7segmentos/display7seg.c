@@ -14,7 +14,7 @@
 */
 
 #include <avr/io.h>
-#include <util/delay.h>
+#include "display7seg.h"
 
 const uint8_t segment_map[16] = {
         0b00111111, // 0
@@ -31,8 +31,7 @@ const uint8_t segment_map[16] = {
         0b01111100, // 11 B
         0b00111001, // 12 C
         0b01011110, // 13 D
-        0b01111001, // 14 E
-        0b01110001  // 15 F
+        0b01111001  // 14 E
     };
 
 void init_ports_display7seg() {
@@ -42,9 +41,12 @@ void init_ports_display7seg() {
 }
 
 void display_digit(uint8_t digit) {
-    if (digit < 16) {
+    if (digit < 15) {
         PORTC = segment_map[digit]; // Mostrar el dígito en el display de 7 segmentos
-    } else {
-        PORTC = 0x00; // Si el dígito no es válido, apagar el display
+    } else if (digit == 15) {
+        clear_display(); // Si el dígito es 15, apagar el display
     }
+}
+void clear_display() {
+    PORTC = 0x00; // Apagar el display de 7 segmentos
 }

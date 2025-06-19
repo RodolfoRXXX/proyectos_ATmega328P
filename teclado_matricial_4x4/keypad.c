@@ -19,8 +19,12 @@
     E  0  F  D
 */
 
+#define F_CPU 1000000UL // Frecuencia del reloj del microcontrolador
+
 #include <avr/io.h>
 #include <util/delay.h>
+
+#include "keypad.h"
 
 const uint8_t keypad_map[4][4] = {
     {0x1, 0x2, 0x3, 0xA},
@@ -37,8 +41,10 @@ void init_port_keypad() {
     PORTD |= 0xFF; // Habilitar pull-up en PD4 a PD7 y asigna PD0 a PD3 en alta
 }
 
-void scan_keypad() {
-    for (uint8_t row = 0; row < 4; row++) {
+uint8_t scan_keypad() {
+    uint8_t row;
+    uint8_t col;
+    for (row = 0; row < 4; row++) {
         // Activar fila
         PORTD &= ~(1 << row); // Poner fila en bajo
         _delay_ms(5); // Esperar estabilización
@@ -47,7 +53,7 @@ void scan_keypad() {
         uint8_t cols = PIND & 0xF0; // Leer PD4 a PD7
 
         if (cols != 0xF0) { // Si alguna columna está en bajo
-            for (uint8_t col = 0; col < 4; col++) {
+            for (col = 0; col < 4; col++) {
                 if (!(cols & (1 << (col + 4)))) { // Verificar si la columna está en bajo
                     while (!(PIND & (1 << (col + 4)))); // Esperar a que la tecla se mantenga presionada
                     return keypad_map[row][col]; // Retornar el valor de la tecla presionada

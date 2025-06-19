@@ -25,8 +25,8 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
-#include "display7seg.h"
-#include "keypad.h"
+#include "../display_7segmentos/display7seg.h"
+#include "../teclado_matricial_4x4/keypad.h"
 
 void init() {
     // Inicializar los puertos

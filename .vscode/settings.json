@@ -2,6 +2,7 @@
     "files.associations": {
         "delay.h": "c",
         "interrupt.h": "c",
-        "display7seg.h": "c"
+        "display7seg.h": "c",
+        "keypad.h": "c"
     }
 }
