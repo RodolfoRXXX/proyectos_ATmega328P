@@ -1,20 +1,30 @@
 {
     "configurations": [
+
         {
-            "name": "Win32",
+
+            "name": "AVR",
+
             "includePath": [
-                "${workspaceFolder}/**"
+
+                "${workspaceFolder}/**",
+
+                "/usr/lib/avr/include"
+
             ],
-            "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE"
-            ],
+
+            "defines": [],
+
+            "compilerPath": "/usr/bin/avr-gcc",
+
             "cStandard": "c11",
-            "cppStandard": "gnu++14",
-            "intelliSenseMode": "windows-gcc-x86",
-            "compilerPath": "C:\\WinAVR-20100110\\bin\\avr-gcc"
+
+            "cppStandard": "c++17",
+
+            "intelliSenseMode": "gcc-x64"
+
         }
+
     ],
     "version": 4
 }
