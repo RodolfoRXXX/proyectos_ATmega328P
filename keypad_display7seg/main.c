@@ -4,7 +4,7 @@
     *
     * @version 1.0
     * @date 2023-10-01
-    * @author YRodolfo Romero
+    * @author Rodolfo Romero
     *
     * Función main para el control de un display de 7 segmentos
     * utilizando un teclado matricial 4x4.
@@ -21,12 +21,11 @@
     * como imprimir el valor de la tecla en el display de 7 segmentos.
 */
 
-#define F_CPU 1000000UL // Frecuencia del reloj del microcontrolador
-
+#include "config/config.h"
 #include <avr/io.h>
 #include <util/delay.h>
-#include "../display_7segmentos/display7seg.h"
-#include "../teclado_matricial_4x4/keypad.h"
+#include "drivers/keypad_4x4/keypad.h"
+#include "drivers/display_7seg/display7seg.h"
 
 void init() {
     // Inicializar los puertos

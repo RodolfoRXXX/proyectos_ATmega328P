@@ -13,6 +13,7 @@
     Este código es parte de una librería que controla el display de 7 segmentos.
 */
 
+#include "../../config/config.h"
 #include <avr/io.h>
 #include "display7seg.h"
 
@@ -36,17 +37,14 @@ const uint8_t segment_map[16] = {
 
 void init_ports_display7seg() {
     // Configurar el puerto C como salida
-    DDRC = 0xFF; // Todos los pines del puerto C como salidas
-    PORTC = 0x00; // Inicializar el puerto C en bajo
+    DISPLAY7SEG_DDR = 0xFF; // Todos los pines del puerto C como salidas
+    DISPLAY7SEG_PORT = 0x00; // Inicializar el puerto C en bajo
 }
 
 void display_digit(uint8_t digit) {
     if (digit < 15) {
-        PORTC = segment_map[digit]; // Mostrar el dígito en el display de 7 segmentos
+        DISPLAY7SEG_PORT = segment_map[digit]; // Mostrar el dígito en el display de 7 segmentos
     } else if (digit == 15) {
-        clear_display(); // Si el dígito es 15, apagar el display
+        DISPLAY7SEG_PORT = 0x00; // Apagar el display si el dígito es 15 (no válido)
     }
-}
-void clear_display() {
-    PORTC = 0x00; // Apagar el display de 7 segmentos
 }

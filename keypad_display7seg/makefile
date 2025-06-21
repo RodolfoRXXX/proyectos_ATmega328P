@@ -6,8 +6,8 @@ CFLAGS = -std=c99 -Os -DF_CPU=$(F_CPU) -mmcu=$(MCU)
 
 # Archivos fuente
 SRCS = main.c \
-       ../teclado_matricial_4x4/keypad.c \
-       ../display_7segmentos/display7seg.c
+       drivers/keypad_4x4/keypad.c \
+       drivers/display_7seg/display7seg.c
 
 # Archivos objeto generados automáticamente a partir de los .c
 OBJS = $(SRCS:.c=.o)

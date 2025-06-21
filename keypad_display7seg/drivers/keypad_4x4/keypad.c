@@ -19,14 +19,13 @@
     E  0  F  D
 */
 
-#define F_CPU 1000000UL // Frecuencia del reloj del microcontrolador
-
+#include "../../config/config.h"
 #include <avr/io.h>
 #include <util/delay.h>
 
 #include "keypad.h"
 
-const uint8_t keypad_map[4][4] = {
+static const uint8_t keypad_map[4][4] = {
     {0x1, 0x2, 0x3, 0xA},
     {0x4, 0x5, 0x6, 0xB},
     {0x7, 0x8, 0x9, 0xC},
@@ -35,10 +34,10 @@ const uint8_t keypad_map[4][4] = {
 
 void init_port_keypad() {
     // Configurar filas como salidas
-    DDRD |= 0x0F; // PD0 a PD3 como salidas(0000 1111)
+    KEYPAD_DDR |= KEYPAD_ROW_MASK; // PD0 a PD3 como salidas(0000 1111)
     // Configurar columnas como entradas con pull-up
-    DDRD &= ~0xF0; // PD4 a PD7 como entradas((0000 1111)&(0000 1111) = 0000 1111)
-    PORTD |= 0xFF; // Habilitar pull-up en PD4 a PD7 y asigna PD0 a PD3 en alta
+    KEYPAD_DDR &= ~KEYPAD_COL_MASK; // PD4 a PD7 como entradas((0000 1111)&(0000 1111) = 0000 1111)
+    KEYPAD_PORT |= (KEYPAD_ROW_MASK | KEYPAD_COL_MASK); // Habilitar pull-up en PD4 a PD7 y asigna PD0 a PD3 en alta
 }
 
 uint8_t scan_keypad() {
@@ -46,23 +45,23 @@ uint8_t scan_keypad() {
     uint8_t col;
     for (row = 0; row < 4; row++) {
         // Activar fila
-        PORTD &= ~(1 << row); // Poner fila en bajo
+        KEYPAD_PORT &= ~(1 << row); // Poner fila en bajo
         _delay_ms(5); // Esperar estabilización
 
         // Leer columnas
-        uint8_t cols = PIND & 0xF0; // Leer PD4 a PD7
+        uint8_t cols = KEYPAD_PIN & KEYPAD_COL_MASK; // Leer PD4 a PD7
 
-        if (cols != 0xF0) { // Si alguna columna está en bajo
+        if (cols != KEYPAD_COL_MASK) { // Si alguna columna está en bajo
             for (col = 0; col < 4; col++) {
                 if (!(cols & (1 << (col + 4)))) { // Verificar si la columna está en bajo
-                    while (!(PIND & (1 << (col + 4)))); // Esperar a que la tecla se mantenga presionada
+                    while (!(KEYPAD_PIN & (1 << (col + 4)))); // Esperar a que la tecla se mantenga presionada
                     return keypad_map[row][col]; // Retornar el valor de la tecla presionada
                 }
             }
         }
 
         // Desactivar fila
-        PORTD |= (1 << row); // Poner fila en alto
+        KEYPAD_PORT |= (1 << row); // Poner fila en alto
     }
     return 0xFF; // Retornar 0xFF si no se presionó ninguna tecla
 }
